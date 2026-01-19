@@ -4,6 +4,23 @@ Autonomous executive assistant with Letta memory layer.
 
 Lethe is a 24/7 AI assistant that you communicate with via Telegram. It processes tasks asynchronously, maintains persistent memory across conversations, and has full access to your machine.
 
+> **⚠️ WARNING: NO SANDBOXING**
+> 
+> Lethe has **unrestricted access** to your system with the same rights as the user running it. It can read, write, and delete any files you can access, execute any commands, and browse the web. There is **no sandboxing or isolation**. 
+>
+> Only run Lethe on systems where you trust the agent with full access. Consider running in a VM or container if you need isolation.
+
+## Self-Modifying Agent
+
+Lethe uses Letta's persistent memory, which means:
+
+- **Teach it tools**: Show the agent how to use CLI tools, and it will remember for future sessions
+- **Shape its identity**: Ask it to update its persona, communication style, or areas of expertise
+- **Project context**: It maintains notes about your current projects and priorities
+- **Learn your preferences**: It remembers how you like things done
+
+The agent can modify its own memory blocks (`persona`, `human`, `project`, `tasks`, `tools`) using `core_memory_append` and `core_memory_replace`, and store unlimited long-term memories in archival storage.
+
 ## Architecture
 
 ```
