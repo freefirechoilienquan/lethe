@@ -65,7 +65,36 @@ async def run():
     logger.info("Background task manager initialized")
 
     agent_manager = AgentManager(settings)
-    telegram_bot = TelegramBot(settings, task_queue)
+    
+    # Initialize agent to get ID (needed for callbacks)
+    agent_id = await agent_manager.get_or_create_agent()
+    
+    # Callback when user stops tasks via /stop command
+    async def on_task_stopped(task_ids: list[str], chat_id: int):
+        """Notify agent that tasks were stopped by user."""
+        tasks_info = []
+        for tid in task_ids:
+            task = await bg_task_manager.get_task(tid)
+            if task:
+                tasks_info.append(f"- {task.description[:50]}...")
+        
+        if tasks_info:
+            # Send a message to the agent informing about cancelled tasks
+            msg = f"[SYSTEM] User cancelled {len(task_ids)} background task(s):\n" + "\n".join(tasks_info)
+            try:
+                await agent_manager.send_message(
+                    message=msg,
+                    on_message=lambda content: None,  # Agent response goes to user via normal channel
+                )
+            except Exception as e:
+                logger.warning(f"Failed to notify agent about stopped tasks: {e}")
+    
+    telegram_bot = TelegramBot(
+        settings, 
+        task_queue,
+        bg_task_manager=bg_task_manager,
+        on_task_stopped=on_task_stopped,
+    )
 
     # Create message worker (passes task_manager for spawn_task tool)
     worker = Worker(task_queue, agent_manager, telegram_bot, bg_task_manager, settings)
@@ -86,8 +115,7 @@ async def run():
     else:
         logger.info("Heartbeat disabled (no allowed_user_ids configured)")
     
-    # Create background task worker
-    # Callback to notify user when a task completes
+    # Callback to notify user when a background task completes
     async def on_task_complete(task):
         if primary_user_id:
             status_emoji = "✅" if task.status.value == "completed" else "❌"
@@ -97,9 +125,6 @@ async def run():
             if task.error:
                 msg += f"\n\nError: {task.error[:200]}"
             await telegram_bot.send_message(primary_user_id, msg)
-    
-    # Initialize agent to get ID
-    agent_id = await agent_manager.get_or_create_agent()
     
     bg_task_worker = TaskWorker(
         task_manager=bg_task_manager,

@@ -11,18 +11,24 @@ from typing import Any, Optional
 
 from lethe.tasks.manager import TaskManager, TaskMode, TaskPriority, TaskStatus
 
-# Context variable set by worker before tool execution
+# Context variables set by worker before tool execution
 _task_manager: ContextVar[Optional[TaskManager]] = ContextVar('task_manager', default=None)
+_telegram_bot: ContextVar[Optional[Any]] = ContextVar('telegram_bot', default=None)
+_telegram_chat_id: ContextVar[Optional[int]] = ContextVar('telegram_chat_id', default=None)
 
 
-def set_task_context(task_manager: TaskManager):
-    """Set the task manager context for tool execution."""
+def set_task_context(task_manager: TaskManager, telegram_bot: Any = None, chat_id: int = None):
+    """Set the task context for tool execution."""
     _task_manager.set(task_manager)
+    _telegram_bot.set(telegram_bot)
+    _telegram_chat_id.set(chat_id)
 
 
 def clear_task_context():
-    """Clear the task manager context."""
+    """Clear the task context."""
     _task_manager.set(None)
+    _telegram_bot.set(None)
+    _telegram_chat_id.set(None)
 
 
 def _get_manager() -> TaskManager:
@@ -78,6 +84,20 @@ async def spawn_task_async(
         priority=task_priority,
         created_by="agent",
     )
+    
+    # Send immediate Telegram notification
+    bot = _telegram_bot.get()
+    chat_id = _telegram_chat_id.get()
+    if bot and chat_id:
+        try:
+            short_desc = description[:60] + "..." if len(description) > 60 else description
+            await bot.send_message(
+                chat_id=chat_id,
+                text=f"⏳ Background task started: {short_desc}\n\nTask ID: `{task.id[:8]}`\nMode: {task.mode.value} | Priority: {task.priority.value}",
+                parse_mode="Markdown",
+            )
+        except Exception:
+            pass  # Don't fail if notification fails
     
     return json.dumps({
         "success": True,

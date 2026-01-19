@@ -62,7 +62,11 @@ class Worker:
                     
                     # Set task manager context for background task tools
                     if self.task_manager:
-                        set_task_context(self.task_manager)
+                        set_task_context(
+                            self.task_manager, 
+                            telegram_bot=self.telegram_bot.bot,
+                            chat_id=task.chat_id,
+                        )
                     
                     # Track messages sent for this task
                     messages_sent = []
