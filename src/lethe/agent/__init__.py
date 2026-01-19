@@ -866,7 +866,7 @@ I'll update this as I learn about my principal's current projects and priorities
                 "approvals": approvals_needed,  # List of ToolReturn items
             }]
 
-        final_result = "\n\n".join(result_parts) if result_parts else "Task completed."
+        final_result = "\n\n".join(result_parts) if result_parts else ""
         logger.info(f"Final result: {len(result_parts)} parts, {len(final_result)} chars")
         return final_result
 
