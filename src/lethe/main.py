@@ -108,10 +108,11 @@ async def run():
             agent_manager=agent_manager,
             telegram_bot=telegram_bot,
             chat_id=primary_user_id,
-            interval_minutes=60,
+            interval_minutes=15,
+            identity_refresh_hours=2,
             enabled=True,
         )
-        logger.info(f"Heartbeat enabled for user {primary_user_id}")
+        logger.info(f"Heartbeat enabled for user {primary_user_id} (every 15 min, identity refresh every 2h)")
     else:
         logger.info("Heartbeat disabled (no allowed_user_ids configured)")
     

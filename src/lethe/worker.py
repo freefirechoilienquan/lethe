@@ -141,15 +141,20 @@ class HeartbeatWorker:
         agent_manager: AgentManager,
         telegram_bot: TelegramBot,
         chat_id: int,  # Chat to send heartbeat responses to
-        interval_minutes: int = 60,
+        interval_minutes: int = 15,
+        identity_refresh_hours: int = 2,
         enabled: bool = True,
     ):
         self.agent_manager = agent_manager
         self.telegram_bot = telegram_bot
         self.chat_id = chat_id
         self.interval_minutes = interval_minutes
+        self.identity_refresh_hours = identity_refresh_hours
         self.enabled = enabled
         self._running = False
+        self._heartbeat_count = 0
+        # How many heartbeats before identity refresh
+        self._identity_refresh_interval = (identity_refresh_hours * 60) // interval_minutes
 
     async def start(self):
         """Start the heartbeat loop."""
@@ -173,7 +178,13 @@ class HeartbeatWorker:
                 date_str = now.strftime("%A, %B %d, %Y")
                 time_str = now.strftime("%H:%M")
                 
-                logger.info(f"Sending heartbeat ({time_str})...")
+                self._heartbeat_count += 1
+                should_refresh_identity = (self._heartbeat_count % self._identity_refresh_interval) == 0
+                
+                if should_refresh_identity:
+                    logger.info(f"Sending heartbeat ({time_str}) + identity refresh...")
+                else:
+                    logger.info(f"Sending heartbeat ({time_str})...")
 
                 messages_sent = []
                 
@@ -187,12 +198,19 @@ class HeartbeatWorker:
                             text=f"🕐 {content}",
                         )
 
+                # Build heartbeat message
+                identity_instruction = ""
+                if should_refresh_identity:
+                    identity_instruction = """
+IDENTITY REFRESH: It's been 2 hours. Please re-read config/identity.md to refresh your persona and instructions. Use read_file to load it, then update your persona memory block if needed.
+"""
+
                 response = await self.agent_manager.send_message(
                     message=f"""[HEARTBEAT]
 
 Current time: {time_str}
 Current date: {date_str}
-
+{identity_instruction}
 This is a periodic check-in. Review your state:
 
 1. Check your MEMORY BLOCKS for any pending tasks, reminders, or notes
