@@ -136,6 +136,12 @@ The agent has access to:
 - `telegram_send_message` - Send additional message to user
 - `telegram_send_file` - Send file to user
 
+### Letta Built-in
+- `web_search` - Search the web for information
+- `fetch_webpage` - Fetch and read a webpage
+- `archival_memory_insert` - Store facts/learnings in long-term semantic memory
+- `archival_memory_search` - Search long-term memory by semantic similarity
+
 ## Browser Setup (Steel)
 
 Browser tools require Steel Browser running locally:
