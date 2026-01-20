@@ -272,6 +272,7 @@ Then import the module in `src/lethe/tools/__init__.py`.
 - [ ] **Full multimodality** - Receive and process images, documents, audio, and video
 - [x] **Long-term persistent subagents** *(partial)* - Delegate tasks to specialized agents
 - [ ] **Workspace and daily agendas** - Structured task management and scheduling
+- [ ] **Active learning** - Use idle time to read articles, papers, or blog posts relevant to user needs or own agent hobbies
 - [ ] **Slack integration** - Access Lethe via Slack
 - [ ] **Discord integration** - Access Lethe via Discord
 
