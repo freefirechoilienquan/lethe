@@ -291,9 +291,9 @@ JSON only:"""
         augmented = f"""{new_message}
 
 ---
-[HIPPOCAMPUS RECALL: {topic_summary}]
+[Associative memory recall: {topic_summary}]
 {memories}
-[END RECALL]"""
+[End of recall]"""
         
         logger.info(f"Augmented message with hippocampus recall ({len(memories)} chars)")
         return augmented
