@@ -130,7 +130,7 @@ class HippocampusManager:
 {context}
 
 LAST MESSAGE FROM USER:
-{new_message[:500]}
+{new_message}
 
 Did the topic change in this LAST MESSAGE compared to the conversation above? If yes, what should I search for in memory?
 JSON only:"""
