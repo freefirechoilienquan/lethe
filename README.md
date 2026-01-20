@@ -255,6 +255,15 @@ def my_custom_tool(arg1: str, arg2: int = 10) -> str:
 
 Then import the module in `src/lethe/tools/__init__.py`.
 
+## Roadmap
+
+- [ ] **Autoassociative memory** - Hippocampus-inspired agent for memory consolidation and retrieval
+- [ ] **Full multimodality** - Receive and process images, documents, audio, and video
+- [x] **Long-term persistent subagents** *(partial)* - Delegate tasks to specialized agents
+- [ ] **Workspace and daily agendas** - Structured task management and scheduling
+- [ ] **Slack integration** - Access Lethe via Slack
+- [ ] **Discord integration** - Access Lethe via Discord
+
 ## License
 
 MIT
