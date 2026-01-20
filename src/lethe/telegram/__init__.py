@@ -1,6 +1,7 @@
 """Telegram bot interface."""
 
 import asyncio
+import base64
 import io
 import logging
 from datetime import datetime
@@ -13,7 +14,6 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.enums import ChatAction
 from aiogram.types import Message
-from letta_client import AsyncLetta
 
 from lethe.config import Settings, get_settings
 from lethe.queue import TaskQueue
@@ -40,9 +40,6 @@ class TelegramBot:
         self.task_queue = task_queue
         self.bg_task_manager = bg_task_manager
         self.on_task_stopped = on_task_stopped  # async callback(task_ids: list[str])
-        
-        self._letta_client: Optional[AsyncLetta] = None
-        self._letta_folder_id: Optional[str] = None
 
         self.bot = Bot(
             token=self.settings.telegram_bot_token,
@@ -52,19 +49,6 @@ class TelegramBot:
 
         self._setup_handlers()
 
-    @property
-    def letta_client(self) -> AsyncLetta:
-        """Get or create the Letta client for file uploads."""
-        if self._letta_client is None:
-            if self.settings.letta_api_key:
-                self._letta_client = AsyncLetta(
-                    base_url=self.settings.letta_base_url,
-                    api_key=self.settings.letta_api_key,
-                )
-            else:
-                self._letta_client = AsyncLetta(base_url=self.settings.letta_base_url)
-        return self._letta_client
-    
     @property
     def downloads_dir(self) -> Path:
         """Get the downloads directory, creating if needed."""
@@ -93,27 +77,6 @@ class TelegramBot:
         await self.bot.download_file(file_path, local_path)
         logger.info(f"Saved file to {local_path}")
         return local_path
-
-    async def get_or_create_folder(self) -> str:
-        """Get or create a folder for storing Telegram images."""
-        if self._letta_folder_id is None:
-            # Try to find existing folder named "telegram_images"
-            folders = await self.letta_client.folders.list()
-            for folder in folders:
-                if getattr(folder, "name", None) == "telegram_images":
-                    self._letta_folder_id = folder.id
-                    break
-            
-            # Create if it doesn't exist
-            if self._letta_folder_id is None:
-                folder = await self.letta_client.folders.create(
-                    name="telegram_images",
-                    description="Images uploaded from Telegram"
-                )
-                self._letta_folder_id = folder.id
-                logger.info(f"Created Letta folder for images: {self._letta_folder_id}")
-        
-        return self._letta_folder_id
 
     def _setup_handlers(self):
         """Set up message handlers."""
@@ -260,22 +223,21 @@ class TelegramBot:
                 # Save locally to workspace/Downloads
                 local_path = await self.save_file_locally(file.file_path, file_name)
                 
-                # Also upload to Letta for multimodal support
-                file_bytes = io.BytesIO()
-                await self.bot.download_file(file.file_path, file_bytes)
-                file_bytes.seek(0)
+                # Read file and encode as base64 for Letta multimodal
+                image_data = local_path.read_bytes()
+                base64_data = base64.standard_b64encode(image_data).decode("utf-8")
                 
-                folder_id = await self.get_or_create_folder()
-                upload_response = await self.letta_client.folders.files.upload(
-                    folder_id=folder_id,
-                    file=file_bytes,
-                    name=file_name,
-                    duplicate_handling="suffix"
-                )
-                letta_file_id = upload_response.id
-                logger.info(f"Uploaded image to Letta: {letta_file_id}")
+                # Determine media type from extension
+                ext = local_path.suffix.lower()
+                media_type = {
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg", 
+                    ".png": "image/png",
+                    ".gif": "image/gif",
+                    ".webp": "image/webp",
+                }.get(ext, "image/jpeg")
                 
-                # Queue the task with both local path and Letta file_id
+                # Queue the task with base64 image data
                 caption = message.caption or f"[Image: {local_path.name}]"
                 task = await self.task_queue.enqueue(
                     chat_id=message.chat.id,
@@ -288,7 +250,8 @@ class TelegramBot:
                         "attachments": [{
                             "type": "image",
                             "local_path": str(local_path),
-                            "letta_file_id": letta_file_id,
+                            "base64_data": base64_data,
+                            "media_type": media_type,
                         }],
                     },
                 )

@@ -1012,17 +1012,18 @@ I'll update this as I learn about my principal's current projects and priorities
             
             for attachment in attachments:
                 if attachment.get("type") == "image":
-                    # Check if we have a Letta file_id (preferred) or URL
-                    if "letta_file_id" in attachment:
+                    # Use base64 encoding for images
+                    if "base64_data" in attachment:
                         content.append({
                             "type": "image",
                             "source": {
-                                "type": "letta",
-                                "file_id": attachment["letta_file_id"],
+                                "type": "base64",
+                                "media_type": attachment.get("media_type", "image/jpeg"),
+                                "data": attachment["base64_data"],
                             }
                         })
                     elif "url" in attachment:
-                        # Fallback to URL for backwards compatibility
+                        # Fallback to URL
                         content.append({
                             "type": "image",
                             "source": {
@@ -1030,8 +1031,11 @@ I'll update this as I learn about my principal's current projects and priorities
                                 "url": attachment["url"],
                             }
                         })
-                # Add more attachment types here as needed (documents, etc.)
-                # For now, non-image attachments will just be in the text context
+                # Non-image attachments: add info to text context
+                elif attachment.get("type") in ("document", "audio", "video", "voice", "video_note"):
+                    local_path = attachment.get("local_path", "")
+                    file_name = attachment.get("file_name", local_path.split("/")[-1] if local_path else "file")
+                    content[0]["text"] += f"\n\n[Attachment: {attachment['type']} - {file_name}]\nSaved to: {local_path}"
             
             messages = [{"role": "user", "content": content}]
         else:
