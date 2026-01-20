@@ -268,12 +268,35 @@ Then import the module in `src/lethe/tools/__init__.py`.
 
 ## Roadmap
 
-- [ ] **Autoassociative memory** - Hippocampus-inspired agent for memory consolidation and retrieval
+- [x] **Autoassociative memory** *(in progress)* - Hippocampus subagent for memory retrieval (see below)
 - [ ] **Full multimodality** - Receive and process images, documents, audio, and video
 - [x] **Long-term persistent subagents** *(partial)* - Delegate tasks to specialized agents
 - [ ] **Workspace and daily agendas** - Structured task management and scheduling
 - [ ] **Slack integration** - Access Lethe via Slack
 - [ ] **Discord integration** - Access Lethe via Discord
+
+## Hippocampus (Autoassociative Memory)
+
+The hippocampus is a lightweight subagent that enhances memory retrieval:
+
+```
+User Message → Hippocampus (haiku) → Memory Search → Augmented Message → Main Agent (sonnet)
+```
+
+**How it works:**
+1. Before each message, hippocampus analyzes the last 5 messages
+2. If a new topic is detected, it extracts a search query
+3. Searches archival memory and conversation history
+4. Prepends relevant context to the message: `[HIPPOCAMPUS RECALL: ...]`
+
+**Configuration:**
+```bash
+HIPPOCAMPUS_ENABLED=true                              # Enable/disable
+HIPPOCAMPUS_MODEL=anthropic/claude-3-haiku-20240307   # Cheap/fast model
+HIPPOCAMPUS_AGENT_NAME=lethe-hippocampus              # Agent name in Letta
+```
+
+The hippocampus agent is created automatically on first use and persists in Letta.
 
 ## License
 
