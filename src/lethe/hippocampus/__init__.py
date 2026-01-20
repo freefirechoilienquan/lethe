@@ -286,13 +286,14 @@ JSON only:"""
         if not memories:
             return new_message
 
-        # Augment the message with recalled memories
+        # Augment the message with recalled memories (append AFTER the user message)
         topic_summary = analysis.get("topic_summary", "this topic")
-        augmented = f"""[HIPPOCAMPUS RECALL - Found relevant context about {topic_summary}]
-{memories}
-[END RECALL]
+        augmented = f"""{new_message}
 
-{new_message}"""
+---
+[HIPPOCAMPUS RECALL: {topic_summary}]
+{memories}
+[END RECALL]"""
         
         logger.info(f"Augmented message with hippocampus recall ({len(memories)} chars)")
         return augmented
