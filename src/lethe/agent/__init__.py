@@ -394,6 +394,16 @@ I'll update this as I learn about my principal's current projects and priorities
             "cancel_task": task_tools.cancel_task_async,
         })
         logger.info("Task management tools registered")
+        
+        # Add introspection tools
+        async def list_my_tools_async() -> str:
+            """List all tools available to me."""
+            import json
+            tools = sorted(self._tool_handlers.keys())
+            return json.dumps({"available_tools": tools, "count": len(tools)}, indent=2)
+        
+        self._tool_handlers["list_my_tools"] = list_my_tools_async
+        logger.info("Introspection tools registered")
 
     async def _register_tools(self) -> list[str]:
         """Register client-side tools with Letta. Returns list of tool names."""
@@ -783,6 +793,14 @@ I'll update this as I learn about my principal's current projects and priorities
             """
             raise Exception("Client-side execution required")
         
+        def list_my_tools() -> str:
+            """List all tools available to me.
+            
+            Returns:
+                JSON with list of available tool names
+            """
+            raise Exception("Client-side execution required")
+        
         stub_functions = [
             bash,
             bash_output,
@@ -816,6 +834,7 @@ I'll update this as I learn about my principal's current projects and priorities
             get_tasks,
             get_task_status,
             cancel_task,
+            list_my_tools,
         ]
 
         for func in stub_functions:
