@@ -858,12 +858,23 @@ I'll update this as I learn about my principal's current projects and priorities
         # First, register all tools with Letta (upsert ensures they exist)
         expected_tool_names = await self._register_tools()
         
-        # Add built-in Letta tools
+        # Add built-in Letta tools (DO NOT detach these!)
         builtin_tools = [
+            # Web tools
             "web_search",
             "fetch_webpage", 
+            # Archival memory
             "archival_memory_insert",
             "archival_memory_search",
+            # Core memory management
+            "memory_insert",
+            "memory_replace",
+            "memory_rethink",
+            "memory_finish_edits",
+            # Conversation
+            "conversation_search",
+            # Messaging
+            "send_message",
         ]
         expected_tool_names.extend(builtin_tools)
         expected_set = set(expected_tool_names)
