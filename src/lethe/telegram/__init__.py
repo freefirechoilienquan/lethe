@@ -556,13 +556,13 @@ class TelegramBot:
         except Exception as e:
             logger.warning(f"Failed to send typing to {chat_id}: {e}")
 
-    async def send_message(self, chat_id: int, text: str, parse_mode: Optional[str] = None, **kwargs):
+    async def send_message(self, chat_id: int, text: str, parse_mode: Optional[str] = "Markdown", **kwargs):
         """Send a message to a chat (can be called from anywhere).
         
         Args:
             chat_id: Telegram chat ID
             text: Message text
-            parse_mode: Optional parse mode. If None, sends as plain text (safest for agent responses)
+            parse_mode: Parse mode (default: Markdown). Falls back to plain text on parse errors.
         """
         # Split long messages
         max_len = 4096
