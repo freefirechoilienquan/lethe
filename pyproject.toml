@@ -11,21 +11,16 @@ dependencies = [
     "pydantic-settings>=2.12.0",
     "httpx>=0.28.0",
     "rich>=13.9.0",
-    "steel-sdk>=0.15.0",
     "pyte>=0.8.0", # Terminal emulator for TUI capture
     "pillow>=12.1.0",
-    "stagehand-alpha>=0.3.1",
 ]
+# Note: Browser automation requires agent-browser CLI: npm install -g agent-browser
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
     "ruff>=0.8.0",
-]
-browser = [
-    "playwright>=1.49.0",
-    "steel-sdk>=0.15.0",
 ]
 
 [project.scripts]

@@ -358,20 +358,28 @@ I'll update this as I learn about my principal's current projects and priorities
             "grep_search": filesystem.grep_search,
         }
         
-        # Add Stagehand browser tools (AI-native, handles modals/shadow DOM/iframes)
+        # Add agent-browser tools (deterministic refs from accessibility tree)
         try:
-            from lethe.tools import browser_stagehand
+            from lethe.tools import browser_agent
             self._tool_handlers.update({
-                "browser_navigate": browser_stagehand.stagehand_navigate_async,
-                "browser_act": browser_stagehand.stagehand_act_async,
-                "browser_extract": browser_stagehand.stagehand_extract_async,
-                "browser_observe": browser_stagehand.stagehand_observe_async,
-                "browser_screenshot": browser_stagehand.stagehand_screenshot_async,
-                "browser_close": browser_stagehand.stagehand_close_async,
+                "browser_open": browser_agent.browser_open_async,
+                "browser_snapshot": browser_agent.browser_snapshot_async,
+                "browser_click": browser_agent.browser_click_async,
+                "browser_fill": browser_agent.browser_fill_async,
+                "browser_type": browser_agent.browser_type_async,
+                "browser_press": browser_agent.browser_press_async,
+                "browser_scroll": browser_agent.browser_scroll_async,
+                "browser_screenshot": browser_agent.browser_screenshot_async,
+                "browser_get_text": browser_agent.browser_get_text_async,
+                "browser_get_url": browser_agent.browser_get_url_async,
+                "browser_wait": browser_agent.browser_wait_async,
+                "browser_select": browser_agent.browser_select_async,
+                "browser_hover": browser_agent.browser_hover_async,
+                "browser_close": browser_agent.browser_close_async,
             })
-            logger.info("Stagehand browser tools registered")
+            logger.info("agent-browser tools registered")
         except ImportError as e:
-            logger.warning(f"Stagehand browser tools not available: {e}")
+            logger.warning(f"agent-browser tools not available: {e}")
         
         # Add Telegram tools
         from lethe.tools import telegram_tools
@@ -571,101 +579,173 @@ I'll update this as I learn about my principal's current projects and priorities
             """
             raise Exception("Client-side execution required")
 
-        # Browser tools for web automation (sessions auto-create on first use)
-        def browser_navigate(url: str) -> str:
-            """Navigate the browser to a URL.
+        # Browser tools using agent-browser CLI (deterministic refs from accessibility tree)
+        # Workflow: browser_open -> browser_snapshot (get refs) -> browser_click/fill using refs
+        
+        def browser_open(url: str) -> str:
+            """Navigate browser to a URL.
             
             Args:
-                url: The URL to navigate to (must include protocol)
+                url: The URL to navigate to (must include protocol like https://)
             
             Returns:
-                JSON with navigation result
+                JSON with navigation result including page title
             """
             raise Exception("Client-side execution required")
         
-        def browser_act(instruction: str) -> str:
-            """Perform an action using natural language.
+        def browser_snapshot(interactive_only: bool = True, compact: bool = True) -> str:
+            """Get accessibility tree snapshot with element refs.
             
-            This is the most powerful browser tool - describe what you want to do
-            in plain English and the AI will figure out how to do it, even for
-            elements in modals, shadow DOM, or iframes.
+            This is the primary way to understand what's on the page. Returns a tree
+            of elements with refs (@e1, @e2, etc.) that you use with other commands.
             
-            Examples:
-                - "click the login button"
-                - "fill the email field with user@example.com"
-                - "scroll down to see more content"
-                - "close the cookie consent popup"
-                - "click Accept in the modal dialog"
-                - "select 'United States' from the country dropdown"
+            ALWAYS call this after opening a page or after actions that change the page.
             
             Args:
-                instruction: Natural language description of the action to perform
+                interactive_only: Only show interactive elements (buttons, links, inputs)
+                compact: Remove empty structural elements
             
             Returns:
-                JSON with action result
+                Accessibility tree with refs like:
+                - heading "Welcome" [ref=e1] [level=1]
+                - button "Sign In" [ref=e2]
+                - textbox "Email" [ref=e3]
+                - link "Learn more" [ref=e4]
             """
             raise Exception("Client-side execution required")
         
-        def browser_extract(instruction: str, schema: dict = None) -> str:
-            """Extract structured data from the current page using AI.
-            
-            Uses AI to understand the page and extract the requested information.
-            
-            Examples:
-                - "extract the main headline"
-                - "extract all product names and prices"
-                - "get the article text"
-                - "find the author name and publication date"
+        def browser_click(ref_or_selector: str) -> str:
+            """Click an element by ref or selector.
             
             Args:
-                instruction: What to extract (natural language)
-                schema: Optional JSON schema for structured output
+                ref_or_selector: Element ref from snapshot (@e1, @e2) or CSS selector
             
             Returns:
-                JSON with extracted data
+                JSON with click result
             """
             raise Exception("Client-side execution required")
         
-        def browser_observe(instruction: str = "") -> str:
-            """Observe the page and find possible actions.
-            
-            Use this to understand what's on the page and what actions are available.
-            Returns a list of interactive elements with selectors.
-            
-            Examples:
-                - "find the login button"
-                - "find all links in the navigation"
-                - "find the submit button in the modal"
+        def browser_fill(ref_or_selector: str, text: str) -> str:
+            """Fill a text input with value (clears existing content first).
             
             Args:
-                instruction: Optional hint about what you're looking for
+                ref_or_selector: Element ref from snapshot (@e1, @e2) or CSS selector
+                text: Text to fill into the input
             
             Returns:
-                JSON with list of observed actions/elements
+                JSON with fill result
             """
             raise Exception("Client-side execution required")
         
-        def browser_screenshot(full_page: bool = False, save_path: str = "", describe: bool = True) -> str:
-            """Take a screenshot of the current browser page.
+        def browser_type(ref_or_selector: str, text: str) -> str:
+            """Type text into element (preserves existing content, types char by char).
+            
+            Args:
+                ref_or_selector: Element ref from snapshot or CSS selector
+                text: Text to type
+            
+            Returns:
+                JSON with type result
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_press(key: str) -> str:
+            """Press a keyboard key.
+            
+            Args:
+                key: Key to press (e.g., "Enter", "Tab", "Escape", "Control+a")
+            
+            Returns:
+                JSON with press result
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_scroll(direction: str = "down", pixels: int = 500) -> str:
+            """Scroll the page.
+            
+            Args:
+                direction: "up", "down", "left", "right"
+                pixels: Number of pixels to scroll
+            
+            Returns:
+                JSON with scroll result
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_screenshot(save_path: str = "", full_page: bool = False) -> str:
+            """Take a screenshot of the current page.
             
             The screenshot image is automatically shown to you (multimodal).
-            Also includes an AI-generated description of the page content.
             
             Args:
-                full_page: Capture full scrollable page (default: False)
-                save_path: Optional path to save screenshot (for sending via Telegram)
-                describe: Include AI description of page content (default: True)
+                save_path: Path to save screenshot (e.g., /tmp/screenshot.png)
+                full_page: Capture full scrollable page (default: viewport only)
             
             Returns:
-                JSON with screenshot info, description, and the image is shown to you
+                JSON with screenshot info, and the image is shown to you
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_get_text(ref_or_selector: str = "") -> str:
+            """Get text content from an element or the whole page.
+            
+            Args:
+                ref_or_selector: Element ref (@e1) or CSS selector. Empty for page text.
+            
+            Returns:
+                JSON with text content
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_get_url() -> str:
+            """Get the current page URL.
+            
+            Returns:
+                JSON with current URL
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_wait(selector: str = "", text: str = "", timeout_ms: int = 30000) -> str:
+            """Wait for an element, text, or time.
+            
+            Args:
+                selector: CSS selector or ref to wait for
+                text: Text to wait for on page
+                timeout_ms: If no selector/text, wait this many milliseconds
+            
+            Returns:
+                JSON with wait result
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_select(ref_or_selector: str, value: str) -> str:
+            """Select an option from a dropdown.
+            
+            Args:
+                ref_or_selector: Element ref or CSS selector for the select element
+                value: Value or label to select
+            
+            Returns:
+                JSON with select result
+            """
+            raise Exception("Client-side execution required")
+        
+        def browser_hover(ref_or_selector: str) -> str:
+            """Hover over an element.
+            
+            Args:
+                ref_or_selector: Element ref or CSS selector
+            
+            Returns:
+                JSON with hover result
             """
             raise Exception("Client-side execution required")
         
         def browser_close() -> str:
-            """Close the browser session and release resources.
+            """Close the browser.
             
             Returns:
-                JSON with success status and profile save status
+                JSON with close result
             """
             raise Exception("Client-side execution required")
         
@@ -787,12 +867,20 @@ I'll update this as I learn about my principal's current projects and priorities
             list_directory,
             glob_search,
             grep_search,
-            # Browser tools (Stagehand - AI-native, handles modals/shadow DOM)
-            browser_navigate,
-            browser_act,
-            browser_extract,
-            browser_observe,
+            # Browser tools (agent-browser - deterministic refs from accessibility tree)
+            browser_open,
+            browser_snapshot,
+            browser_click,
+            browser_fill,
+            browser_type,
+            browser_press,
+            browser_scroll,
             browser_screenshot,
+            browser_get_text,
+            browser_get_url,
+            browser_wait,
+            browser_select,
+            browser_hover,
             browser_close,
             # Telegram tools
             telegram_send_message,
