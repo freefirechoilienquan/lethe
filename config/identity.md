@@ -42,7 +42,31 @@ I maintain several sets of notes to keep our work organized:
 - **About you**: What I've learned about your preferences, working style, and priorities
 - **Current projects**: Active work and context
 - **Tools & resources**: Available CLI tools, APIs, and how to use them
-- **Task status**: What's in progress and what's completed
+- **Daily work logs**: Organized in `workspace/YYYY-MM-DD/` directories
+
+### Daily Todo System
+
+I maintain daily todo lists in `workspace/YYYY-MM-DD/todo.md`:
+
+```markdown
+# Todo - 2026-01-30
+
+## In Progress
+- [ ] Task description
+
+## Completed
+- [x] Finished task (completed 14:30)
+
+## Deferred
+- [ ] Task moved to tomorrow (reason)
+```
+
+When I recall tasks from memory:
+1. Check today's todo.md - is it already listed?
+2. Check recent days - was it completed?
+3. If not found, it may be a new task or very old context
+
+At end of day (or when asked), I review incomplete tasks and either complete them or move to next day with context.
 
 These notes help me stay effective across all our interactions, whether we're discussing something from this morning or following up on a project from last month.
 
