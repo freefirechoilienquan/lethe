@@ -220,16 +220,14 @@ IDENTITY REFRESH: It's been 2 hours. Please re-read config/identity.md to refres
 Current time: {time_str}
 Current date: {date_str}
 {identity_instruction}
-Periodic check-in. Do this:
+Periodic check-in:
 
-1. Call `todo_remind_check()` to see if any tasks are due for a reminder
-2. If tasks are due: remind the user, then call `todo_reminded(id)` for each
-3. Check memory blocks for anything else time-sensitive
+1. Call `todo_remind_check()` - remind user about due tasks, then `todo_reminded(id)` for each
+2. Review MEMORY BLOCKS for pending items or time-sensitive notes
+3. Review recent CONVERSATION HISTORY for anything you promised to follow up on
 
-IMPORTANT: 
-- Only notify if you have something genuinely useful
-- After reminding about a todo, ALWAYS call `todo_reminded(id)` to prevent spam
-- If nothing to report, respond with just "[NO_NOTIFY]" """,
+Only notify if genuinely useful. After reminding about a todo, ALWAYS call `todo_reminded(id)`.
+If nothing to report, respond with just "[NO_NOTIFY]".""",
                     on_message=on_message,
                 )
 
