@@ -64,37 +64,127 @@ Clawd requires manual memory management through Markdown files and reactive comp
 
 ## Quick Start
 
-### 1. Prerequisites
+### One-Line Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/atemerev/lethe/main/install.sh | bash
+```
+
+The installer will:
+1. Check prerequisites (Python 3.11+, git)
+2. Install `uv` if missing
+3. Prompt for your Telegram bot token and Letta API key
+4. Set up auto-start service (systemd on Linux, launchd on Mac)
+
+**That's it!** Message your bot on Telegram.
+
+### Safety-First Install (Container)
+
+If you want Lethe isolated from your system:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/atemerev/lethe/main/install.sh | bash -s -- --contained
+```
+
+This runs Lethe in Docker/Podman with access only to:
+- `~/.lethe/workspace` - Agent's workspace
+- `~/.lethe/data` - Databases
+
+### Uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/atemerev/lethe/main/uninstall.sh | bash
+```
+
+### Manual Install
+
+<details>
+<summary>Click to expand manual installation steps</summary>
+
+#### 1. Prerequisites
 
 - Python 3.11+
 - [uv](https://github.com/astral-sh/uv) for dependency management
 - [Letta Cloud](https://app.letta.com) API key (free tier available) or local Letta server
 - Telegram bot token from [@BotFather](https://t.me/BotFather)
 
-### 2. Install
+#### 2. Install
 
 ```bash
+git clone https://github.com/atemerev/lethe.git
 cd lethe
 uv sync
 ```
 
-### 3. Configure
+#### 3. Configure
 
 ```bash
 cp .env.example .env
 # Edit .env with your settings:
 # - TELEGRAM_BOT_TOKEN (required)
-# - TELEGRAM_ALLOWED_USER_IDS (your Telegram user ID)
+# - ALLOWED_USER_IDS (your Telegram user ID)
 # - LETTA_API_KEY (get from https://app.letta.com)
 ```
 
-### 4. Run Lethe
+#### 4. Run Lethe
 
 ```bash
 uv run lethe
-# or
-uv run python -m lethe.main
 ```
+
+#### 5. (Optional) Set up as service
+
+**Linux (systemd):**
+```bash
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/lethe.service << EOF
+[Unit]
+Description=Lethe Autonomous AI Agent
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$(pwd)
+ExecStart=$(pwd)/.venv/bin/python -m lethe
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user daemon-reload
+systemctl --user enable --now lethe
+```
+
+**Mac (launchd):**
+```bash
+cat > ~/Library/LaunchAgents/com.lethe.agent.plist << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.lethe.agent</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$(pwd)/.venv/bin/python</string>
+        <string>-m</string>
+        <string>lethe</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>$(pwd)</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>
+EOF
+
+launchctl load ~/Library/LaunchAgents/com.lethe.agent.plist
+```
+
+</details>
 
 ### (Optional) Use Local Letta Server
 
