@@ -97,6 +97,7 @@ async def run():
         process_callback=worker.process_message,
         bg_task_manager=bg_task_manager,
         on_task_stopped=on_task_stopped,
+        agent_manager=agent_manager,
     )
     
     # Wire up telegram_bot reference to worker

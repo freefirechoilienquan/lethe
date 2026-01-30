@@ -36,12 +36,14 @@ class TelegramBot:
         process_callback: Optional[Callable] = None,  # Async callback for processing messages
         bg_task_manager: Optional["TaskManager"] = None,
         on_task_stopped: Optional[Callable] = None,  # Callback when task stopped via /stop
+        agent_manager: Optional["AgentManager"] = None,
     ):
         self.settings = settings or get_settings()
         self.conversation_manager = conversation_manager
         self.process_callback = process_callback  # async def(chat_id, user_id, message, metadata, interrupt_check)
         self.bg_task_manager = bg_task_manager
         self.on_task_stopped = on_task_stopped  # async callback(task_ids: list[str])
+        self.agent_manager = agent_manager
 
         self.bot = Bot(
             token=self.settings.telegram_bot_token,
