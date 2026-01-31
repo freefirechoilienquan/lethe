@@ -500,6 +500,15 @@ EOF
     $RUNTIME build -t lethe:latest "$INSTALL_DIR"
     success "Container built"
     
+    # Detect timezone
+    if [ -f /etc/timezone ]; then
+        HOST_TZ=$(cat /etc/timezone)
+    elif [ -f /etc/localtime ]; then
+        HOST_TZ=$(readlink /etc/localtime | sed 's|.*/zoneinfo/||')
+    else
+        HOST_TZ="UTC"
+    fi
+    
     # Create run script (:Z for SELinux compatibility, harmless elsewhere)
     cat > "$INSTALL_DIR/run-lethe.sh" << EOF
 #!/bin/bash
@@ -507,6 +516,7 @@ $RUNTIME run -d \\
     --name lethe \\
     --restart unless-stopped \\
     --env-file "$CONFIG_DIR/.env" \\
+    -e TZ=$HOST_TZ \\
     -v "$HOME/lethe/workspace:/app/workspace:Z" \\
     -v "$HOME/lethe/data:/app/data:Z" \\
     lethe:latest
