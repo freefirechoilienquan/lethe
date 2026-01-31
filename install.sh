@@ -229,6 +229,7 @@ install_agent_browser() {
     
     # Install agent-browser globally
     npm install -g agent-browser
+    agent-browser install
     success "agent-browser installed"
 }
 
@@ -520,7 +521,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/root/.local/bin:$PATH"
 
 # Install agent-browser for browser automation
-RUN npm install -g agent-browser
+RUN npm install -g agent-browser && agent-browser install
 
 WORKDIR /app
 
