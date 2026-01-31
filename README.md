@@ -64,36 +64,34 @@ Clawd requires manual memory management through Markdown files and reactive comp
 
 ## Quick Start
 
-### One-Line Install
+### One-Line Install (Safe Mode)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/atemerev/lethe/main/install.sh | bash
+curl -fsSL https://lethe.gg/install | bash
 ```
 
-The installer will:
-1. Check prerequisites (Python 3.11+, git)
-2. Install `uv` if missing
-3. Prompt for your Telegram bot token and Letta API key
-4. Set up auto-start service (systemd on Linux, launchd on Mac)
+This runs Lethe in Docker/Podman with isolated access:
+- `~/lethe/workspace` - Drop files here for the agent
+- `~/lethe/data` - Databases
+
+The installer prompts for Telegram bot token, Letta API key, and your Telegram user ID.
 
 **That's it!** Message your bot on Telegram.
 
-### Safety-First Install (Container)
+### Full System Access (Unsafe)
 
-If you want Lethe isolated from your system:
+If you want Lethe to have full access to your machine:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/atemerev/lethe/main/install.sh | bash -s -- --contained
+curl -fsSL https://lethe.gg/install | bash -s -- --unsafe
 ```
 
-This runs Lethe in Docker/Podman with access only to:
-- `~/.lethe/workspace` - Agent's workspace
-- `~/.lethe/data` - Databases
+This installs natively with systemd (Linux) or launchd (Mac). The agent can read/write any file, run any command.
 
 ### Uninstall
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/atemerev/lethe/main/uninstall.sh | bash
+curl -fsSL https://lethe.gg/uninstall | bash
 ```
 
 ### Manual Install
